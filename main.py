@@ -10,5 +10,4 @@ from bfs import *
 from a_star import *"""
 from imageTranslator import *
 
-mazeArray = TranslateImage()
-#print(mazeArray)
+mazeArray = TranslateImage() # array de elementos del laberinto
