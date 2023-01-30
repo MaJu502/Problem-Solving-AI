@@ -26,3 +26,5 @@ def generateOUT(x,w,h):
     newM = pim.new("RGB", (w,h))
     newM.putdata(retorno)
     newM.save('out.bmp')
+    print(' >> C O M P L E T A D O!')
+    print(' >> (busca el archivo con el nombre de out.bmp)')
