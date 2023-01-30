@@ -7,21 +7,16 @@ auth: Marco Jurado
 import numpy as np
 from PIL import Image as pim
 
-#constants
-cellSize = 10 # size given to the cells created in the maze
-imageInput = '.\mazeInputs\Input.bmp' #image given by user
-imageOut = 'solvedMaze.bmp' #image given to the user with solution marked
-
 """
 Toma una imagen y la comienza a traducir para generar el array
 """
-def TranslateImage():
+def TranslateImage(w,h, im):
 
     # ------------------------------------- Pixel -----------------------------------------------
     temp = []
-    M = pim.open(imageInput)
+    M = pim.open(im)
     # ahora que esta abierta la imagen se comienza a reducir de tamano y traducir
-    M = M.resize((100,100), pim.NEAREST).convert("RGB")
+    M = M.resize((w,h), pim.NEAREST).convert("RGB")
     tempM = M.getdata()
     # se codifican los items del laberinto
     for r,g,b in tempM:
@@ -45,9 +40,9 @@ def TranslateImage():
         linea = []
         for pixel in row:
             if pixel == [0,0,0]:
-                linea.append(0)
-            elif pixel == [255,255,255]:
                 linea.append(1)
+            elif pixel == [255,255,255]:
+                linea.append(0)
             elif pixel[0] >= 200:
                 linea.append(2)
             elif pixel[1] >= 200:

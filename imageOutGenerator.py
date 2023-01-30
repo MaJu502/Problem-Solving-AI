@@ -9,14 +9,20 @@ from PIL import Image as pim
 """
 Toma un arreglo x y comienza a generar la imagen de output
 """
-def generateOUT(x):
-    pim.fromarray(Conversion(np.array(x)), 'RGB').save('solvedMaze.bmp')
-
-"""
-Toma un arreglo x y comienza a generar la imagen de output
-"""
-def Conversion(x):
-    mapeo = {1: [255, 255, 255], 0: [0, 0, 0], 2: [0, 255, 0], 3: [255, 0, 0]}
-
-    retorno = np.vectorize(mapeo.get)(x)
-    return retorno
+def generateOUT(x,w,h):
+    retorno =[]
+    for i in x:
+        for j in i:
+            if j == 1:
+                retorno.append((0,0,0))
+            elif j == 0:
+                retorno.append((255,255,255))
+            elif j == 2:
+                retorno.append((255,0,0))
+            elif j == 3:
+                retorno.append((0,255,0))
+            elif j == 6:
+                retorno.append((180,0,200))
+    newM = pim.new("RGB", (w,h))
+    newM.putdata(retorno)
+    newM.save('out.bmp')
