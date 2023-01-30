@@ -9,5 +9,11 @@ import framework
 from bfs import *
 from a_star import *"""
 from imageTranslator import *
+from getSartFinish import *
 
 mazeArray = TranslateImage() # array de elementos del laberinto
+startPoint = getStart(mazeArray) # coordenadas del punto de inicio
+endPoint = getEnd(mazeArray) #coordenadas de los puntos de llegada o goal.
+
+
+
