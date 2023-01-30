@@ -13,18 +13,18 @@ class framework(ABC):
 
     # defined function action(s) => [a1,a2,a3,a4,...,ax]
     @abstractmethod
-    def action(self,s):
+    def action(self,s,a):
         pass
 
     # defined function results(s,a) => s
     @abstractmethod
-    def results(self, s, a):
+    def result(self, s, a):
         """Devuelve Array de nodos visitados en el estado actual"""
         pass
 
     # defined function goalTest(s) => [True, False]
     @abstractmethod
-    def goalTests(self, s):
+    def goalTest(self, s):
         pass
 
     # defined function stepCost(s,a,s) => R
