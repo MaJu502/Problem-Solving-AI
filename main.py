@@ -59,7 +59,7 @@ elif algor == '2':
     dfSearch = DFS(maze=mazeArray, start=startPoint, endpoints=endPoint)
     path = dfSearch.shortPath()
 
-    
+
 elif algor == '2' and inputIM == '2':
     # bfs turing
     dfSearch = DFS(maze=mazeArray, start=startPoint, endpoints=endPoint)
@@ -73,11 +73,11 @@ elif algor == '1' and inputIM == '2':
 elif algor == '3':
     # a*
     dfSearch = DFS(maze=mazeArray, start=startPoint, endpoints=endPoint)
-    path = dfSearch.shortPath()
+    path = dfSearch.solve()
 elif algor == '4':
     # a*
     dfSearch = DFS(maze=mazeArray, start=startPoint, endpoints=endPoint)
-    path = dfSearch.shortPath()
+    path = dfSearch.solve()
 
 
 
