@@ -46,7 +46,7 @@ print("""
         1. BFS
         2. DFS
         3. A* (Manhattan heuristic)
-        4. A* (Manhattan heuristic)
+        4. A* (Euclid heuristic)
 """)
 algor = input(' > ingresa la opcion que deseas: ')
 print(' >> P R O C E S A N D O ...')
