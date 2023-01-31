@@ -7,7 +7,7 @@ created 1/24/2023
 import framework
 from bfs import *
 from dfs import *
-"""from a_star import *"""
+from a_star import *
 from imageTranslator import *
 from imageOutGenerator import *
 from getSartFinish import *
@@ -72,12 +72,12 @@ elif algor == '1' and inputIM == '2':
 
 elif algor == '3':
     # a*
-    dfSearch = DFS(maze=mazeArray, start=startPoint, endpoints=endPoint)
-    path = dfSearch.solve()
+    ASMSearch = ASTARM(maze=mazeArray, start=startPoint, endpoints=endPoint)
+    path = ASMSearch.graphSearch()
 elif algor == '4':
     # a*
-    dfSearch = DFS(maze=mazeArray, start=startPoint, endpoints=endPoint)
-    path = dfSearch.solve()
+    ASESearch = ASTARE(maze=mazeArray, start=startPoint, endpoints=endPoint)
+    path = ASESearch.graphSearch()
 
 
 

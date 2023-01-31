@@ -14,7 +14,7 @@ class BFS(framework):
         self.visited = []
         self.path = []
         
-        self.solve() # busca las soluciones del laberinto 
+        self.graphSearch() # busca las soluciones del laberinto 
 
 
     """
@@ -22,7 +22,7 @@ class BFS(framework):
     3 siendo este el numero asignado a la casilla verde en la imagen del 
     laberinto.
     """
-    def solve(self):
+    def graphSearch(self):
         try:
             while self.fronteras:
                 # mientras existan fronteras
@@ -37,7 +37,7 @@ class BFS(framework):
 
     """
     busca el camino mas corto dentro del laberinto utilizando los caminos y
-    backtracing.
+    backtracing. Basado en Graph Search
     """
     def shortPath(self):
         self.fronteras, self.visited, self.backtracing = [self.start], [self.start], {self.start: None}

@@ -6,13 +6,12 @@ created 1/27/2023
 """
 import numpy as np
 from framework import framework
-import math
 
 class ASTARM(framework):
     def __init__(self,maze,start,endpoints):
         self.maze, self.start, self.end = maze, start, endpoints
         self.h, self.w = len(maze), len(maze[0])
-        self.fronteras = [self.start]
+        self.fronteras = []
         self.visited = []
         self.path = [] 
 
@@ -22,39 +21,54 @@ class ASTARM(framework):
     3 siendo este el numero asignado a la casilla verde en la imagen del 
     laberinto.
     """
-    def solve(self):
-        try:
-            while self.fronteras:
-                # mientras existan fronteras
-                now = self.fronteras.pop(0) # la ubicacion actual del agente
-                self.path.append(now) # se anade la casilla al path
-                if self.goalTest(now): # compobar si se ha llegado a una casilla de goal (no. 3)
-                    return self.path # path completo
-                self.getMoreFontiersNormal(now)
-        except Exception as e:
-            raise Exception(' >> No se ha logrado encontrar una solucion para el laberinto.')
-    
+    def graphSearch(self):
+        # se calcula la F (heuristica) del start point
+        startX,startY = self.start
+        self.fronteras = [(startX,startY, self.manhat(self.start))]
 
-    """
-    busca el camino mas corto dentro del laberinto utilizando los caminos y
-    backtracing.
-    """
-    def shortPath(self):
-        self.fronteras, self.visited, self.backtracing = [self.start], [self.start], {self.start: None}
-        try:
-            while self.fronteras:
-                # mientras existan fronteras
-                self.agentNow = self.fronteras.pop(0) # la ubicacion actual del agente
-                if self.goalTest(self.agentNow): # comrpobar si se ha llegado a una casilla de goal (no. 3)
-                    self.path = [self.start]
-                    while self.agentNow != self.start:
-                        self.result(2, self.agentNow)
-                    self.path.reverse() # se voltea el arreglo para empezar por el punto de llegada (backtrace)
+        while self.fronteras:
+            # mientras existan fronteras
+
+            temp = 0
+            lowestF = min(self.fronteras, key=lambda x: x[2]) # la cord que tiene la heuristica más baja de todos. 
+
+            for i, item in enumerate(self.fronteras):
+                if item == lowestF:
+                    temp = i
+
+            now = self.fronteras.pop(temp) # la ubicacion actual del agente
+            self.path.append((now[0],now[1]))
+            
+            self.nowFronteras = [] # reset a vecinos
+            laX,laY,laF = now
+            self.getFronterasREMIX((laX,laY)) # fronteras
+
+            for vecino in self.nowFronteras:
+                X,Y = vecino
+                if self.goalTest((X,Y)):
+                    self.path.append((X,Y))
                     return self.path
-                self.getMoreFontiersShort(self.agentNow)
-        except Exception as e:
-            raise Exception(' >> No se ha logrado encontrar una solucion para el laberinto.')
+                    
+                tempF = self.manhat((X,Y))
+                self.fronteras.append((X,Y,tempF))
+        return self.path
 
+    
+    """
+    Toma las cordenadas de las posiciones del punto de llegada y el punto actual 
+    del agente para determinar la distancia de la heuristica de manhattan. 
+    https://www.101computing.net/manhattan-distance-calculator/
+    maze => laberinto array
+    s =>  punto actual en el mapa del agente.
+    """
+    def manhat(self, s):
+        xG,yG = self.end[0]
+        xA,yA = s
+
+        x = xA - xG
+        y = yG - yA
+
+        return ((x + y) - 1 * min(x,y) + 1)
 
 
     """
@@ -90,34 +104,33 @@ class ASTARM(framework):
         if self.w -1 > X:
             if self.action(X+1,Y):
                 self.result(0,(X+1,Y))
-        
-    
+
     """
-    Realiza el siguiente movimiento en el laberinto para poder ir avanzando
-    en las fronteras exploradas. Este metodo funciona para el backtrace dentro
-    del laberinto.
+    Fronteras de la posicion actual. 
     """
-    def getMoreFontiersShort(self,s):
-        X,Y = s # coordenadas X y Y del punto actual desde el que se buscan nuevas fronteras.
+    def getFronterasREMIX(self,x):
+        retorno = []
+        X,Y = x # coordenadas X y Y del punto actual desde el que se buscan nuevas fronteras.a
         # frontera arriba (y-1 pues se va a la linea de arriba)
+
         if Y > 0:
             if self.action(X,Y-1):
-                self.result(1,(X,Y-1))
+                self.result(3,(X,Y-1))
         # frontera abajo (y+1 pues va a la linea de abajo)
         if self.h -1 > Y:
             # mientras la cord en Y sea menor a al ultimo indice de linea en el arreglo
             if self.action(X,Y+1):
-                self.result(1,(X,Y+1))
+                self.result(3,(X,Y+1))
         # frontera izquierda (x-1 pues va a la columna de la izquierda)
         if X > 0:
             if self.action(X-1,Y):
-                self.result(1,(X-1,Y))
+                self.result(3,(X-1,Y))
         # frontera derecha (x+1 pues va a la columna de la derecha)
         if self.w -1 > X:
             if self.action(X+1,Y):
-                self.result(1,(X+1,Y))
-
-
+                self.result(3,(X+1,Y))
+        
+    
 
     """
     se mueve a las cordenadas que queremos evaluar y devuelve True si dicha 
@@ -139,6 +152,10 @@ class ASTARM(framework):
         if typ == 2:
             self.path.append(s)
             self.agentNow = self.backtracing[s]
+        elif typ == 3:
+            if self.checkNotVisited(s):
+                self.visited.append(s)
+                self.nowFronteras.append(s)
         else:
             if self.checkNotVisited(s):
                 self.visited.append(s)
@@ -160,15 +177,15 @@ class ASTARM(framework):
     
     def pathCost(self, s):
         return len(s)-1
-        
-class ASTART(framework):
+
+
+class ASTARE(framework):
     def __init__(self,maze,start,endpoints):
         self.maze, self.start, self.end = maze, start, endpoints
         self.h, self.w = len(maze), len(maze[0])
-        self.fronteras = [self.start]
+        self.fronteras = []
         self.visited = []
-        self.path = []
-        
+        self.path = [] 
 
 
     """
@@ -176,39 +193,54 @@ class ASTART(framework):
     3 siendo este el numero asignado a la casilla verde en la imagen del 
     laberinto.
     """
-    def solve(self):
-        try:
-            while self.fronteras:
-                # mientras existan fronteras
-                now = self.fronteras.pop(0) # la ubicacion actual del agente
-                self.path.append(now) # se anade la casilla al path
-                if self.goalTest(now): # compobar si se ha llegado a una casilla de goal (no. 3)
-                    return self.path # path completo
-                self.getMoreFontiersNormal(now)
-        except Exception as e:
-            raise Exception(' >> No se ha logrado encontrar una solucion para el laberinto.')
-    
+    def graphSearch(self):
+        # se calcula la F (heuristica) del start point
+        startX,startY = self.start
+        self.fronteras = [(startX,startY, self.euclid(self.start))]
 
-    """
-    busca el camino mas corto dentro del laberinto utilizando los caminos y
-    backtracing.
-    """
-    def shortPath(self):
-        self.fronteras, self.visited, self.backtracing = [self.start], [self.start], {self.start: None}
-        try:
-            while self.fronteras:
-                # mientras existan fronteras
-                self.agentNow = self.fronteras.pop(0) # la ubicacion actual del agente
-                if self.goalTest(self.agentNow): # comrpobar si se ha llegado a una casilla de goal (no. 3)
-                    self.path = [self.start]
-                    while self.agentNow != self.start:
-                        self.result(2, self.agentNow)
-                    self.path.reverse() # se voltea el arreglo para empezar por el punto de llegada (backtrace)
+        while self.fronteras:
+            # mientras existan fronteras
+
+            temp = 0
+            lowestF = min(self.fronteras, key=lambda x: x[2]) # la cord que tiene la heuristica más baja de todos. 
+
+            for i, item in enumerate(self.fronteras):
+                if item == lowestF:
+                    temp = i
+
+            now = self.fronteras.pop(temp) # la ubicacion actual del agente
+            self.path.append((now[0],now[1]))
+            
+            self.nowFronteras = [] # reset a vecinos
+            laX,laY,laF = now
+            self.getFronterasREMIX((laX,laY)) # fronteras
+
+            for vecino in self.nowFronteras:
+                X,Y = vecino
+                if self.goalTest((X,Y)):
+                    self.path.append((X,Y))
                     return self.path
-                self.getMoreFontiersShort(self.agentNow)
-        except Exception as e:
-            raise Exception(' >> No se ha logrado encontrar una solucion para el laberinto.')
+                    
+                tempF = self.euclid((X,Y))
+                self.fronteras.append((X,Y,tempF))
+        return self.path
 
+    
+    """
+    Toma las cordenadas de las posiciones del punto de llegada y el punto actual 
+    del agente para determinar la distancia de la heuristica de euclid.
+    https://github.com/brean/python-pathfinding/blob/main/pathfinding/core/heuristic.py
+    maze => laberinto array
+    s =>  punto actual en el mapa del agente.
+    """
+    def euclid(self, s):
+        xG,yG = self.end[0]
+        xA,yA = s
+
+        x = xA - xG
+        y = yG - yA
+
+        return int(np.sqrt(x**2 + y**2)) + 1
 
 
     """
@@ -244,34 +276,33 @@ class ASTART(framework):
         if self.w -1 > X:
             if self.action(X+1,Y):
                 self.result(0,(X+1,Y))
-        
-    
+
     """
-    Realiza el siguiente movimiento en el laberinto para poder ir avanzando
-    en las fronteras exploradas. Este metodo funciona para el backtrace dentro
-    del laberinto.
+    Fronteras de la posicion actual. 
     """
-    def getMoreFontiersShort(self,s):
-        X,Y = s # coordenadas X y Y del punto actual desde el que se buscan nuevas fronteras.
+    def getFronterasREMIX(self,x):
+        retorno = []
+        X,Y = x # coordenadas X y Y del punto actual desde el que se buscan nuevas fronteras.a
         # frontera arriba (y-1 pues se va a la linea de arriba)
+
         if Y > 0:
             if self.action(X,Y-1):
-                self.result(1,(X,Y-1))
+                self.result(3,(X,Y-1))
         # frontera abajo (y+1 pues va a la linea de abajo)
         if self.h -1 > Y:
             # mientras la cord en Y sea menor a al ultimo indice de linea en el arreglo
             if self.action(X,Y+1):
-                self.result(1,(X,Y+1))
+                self.result(3,(X,Y+1))
         # frontera izquierda (x-1 pues va a la columna de la izquierda)
         if X > 0:
             if self.action(X-1,Y):
-                self.result(1,(X-1,Y))
+                self.result(3,(X-1,Y))
         # frontera derecha (x+1 pues va a la columna de la derecha)
         if self.w -1 > X:
             if self.action(X+1,Y):
-                self.result(1,(X+1,Y))
-
-
+                self.result(3,(X+1,Y))
+        
+    
 
     """
     se mueve a las cordenadas que queremos evaluar y devuelve True si dicha 
@@ -293,6 +324,10 @@ class ASTART(framework):
         if typ == 2:
             self.path.append(s)
             self.agentNow = self.backtracing[s]
+        elif typ == 3:
+            if self.checkNotVisited(s):
+                self.visited.append(s)
+                self.nowFronteras.append(s)
         else:
             if self.checkNotVisited(s):
                 self.visited.append(s)

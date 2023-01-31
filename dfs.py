@@ -14,7 +14,7 @@ class DFS(framework):
         self.visited = []
         self.path = []
         
-        self.solve() # busca las soluciones del laberinto 
+        self.graphSearch() # busca las soluciones del laberinto 
 
 
     """
@@ -22,11 +22,11 @@ class DFS(framework):
     3 siendo este el numero asignado a la casilla verde en la imagen del 
     laberinto.
     """
-    def solve(self):
+    def graphSearch(self):
         try:
             while self.fronteras:
                 # mientras existan fronteras
-                now = self.fronteras.pop(0) # la ubicacion actual del agente
+                now = self.fronteras.pop() # DIFERENCIA ENTRE DFS y BFS
                 self.path.append(now) # se anade la casilla al path
                 if self.goalTest(now): # compobar si se ha llegado a una casilla de goal (no. 3)
                     return self.path # path completo
@@ -37,7 +37,7 @@ class DFS(framework):
 
     """
     busca el camino mas corto dentro del laberinto utilizando los caminos y
-    backtracing.
+    backtracing. Basado en graph search.
     """
     def shortPath(self):
         self.fronteras, self.visited, self.backtracing = [self.start], [self.start], {self.start: None}
@@ -160,4 +160,4 @@ class DFS(framework):
     
     def pathCost(self, s):
         return len(s)-1
-        self.solve()
+        self.graphSearch()
